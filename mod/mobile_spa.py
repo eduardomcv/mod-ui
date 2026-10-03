@@ -39,8 +39,12 @@ def resolve_request(root, url_path):
 
     # realpath, not abspath: a symlink in the build must not lead out of root.
     root_real = os.path.realpath(root)
+
+    def inside_root(path):
+        return path == root_real or path.startswith(root_real + os.sep)
+
     target = os.path.realpath(os.path.join(root_real, rel))
-    if target != root_real and not target.startswith(root_real + os.sep):
+    if not inside_root(target):
         return None
     if rel and os.path.isfile(target):
         return rel
@@ -49,7 +53,8 @@ def resolve_request(root, url_path):
     # that asset, and an immutable one for a year.
     if segments and (segments[0] == APP_DIR or "." in segments[-1]):
         return None
-    if os.path.isfile(os.path.join(root_real, INDEX)):
+    index = os.path.realpath(os.path.join(root_real, INDEX))
+    if inside_root(index) and os.path.isfile(index):
         return INDEX
     return None
 

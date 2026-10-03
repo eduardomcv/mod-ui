@@ -82,6 +82,20 @@ class TestResolveRequest(unittest.TestCase):
         os.symlink(self.secret, os.path.join(self.root, "link.txt"))
         self.assertIsNone(self.resolve("link.txt"))
 
+    def test_index_symlinked_out_of_root_is_404(self):
+        outside = write(self.tmp, "outside.html", "<!doctype html>outside")
+        index = os.path.join(self.root, "index.html")
+        os.remove(index)
+        os.symlink(outside, index)
+        self.assertIsNone(self.resolve(""))
+        self.assertIsNone(self.resolve("boards"))
+        self.assertIsNone(self.resolve("index.html"))
+
+    def test_directory_symlinked_out_of_root_is_404(self):
+        write(self.tmp, "outdir/leak.txt", "leak")
+        os.symlink(os.path.join(self.tmp, "outdir"), os.path.join(self.root, "linked"))
+        self.assertIsNone(self.resolve("linked/leak.txt"))
+
     def test_nul_byte_is_404(self):
         self.assertIsNone(self.resolve("index.html\x00.js"))
 
