@@ -114,6 +114,40 @@ class TestMobileStaticFileHandler(AsyncHTTPTestCase):
         self.assertEqual(resp.code, 200)
         self.assertIn("new build", resp.body.decode())
 
+    def test_unchanged_file_gives_304_with_both_validators(self):
+        first = self.fetch("/m/")
+        resp = self.fetch("/m/", headers={
+            "If-None-Match": first.headers["Etag"],
+            "If-Modified-Since": first.headers["Last-Modified"],
+        })
+        self.assertEqual(resp.code, 304)
+
+    def test_replaced_file_with_same_mtime_gives_200(self):
+        first = self.fetch("/m/")
+        path = os.path.join(self.root, "index.html")
+        mtime_ns = os.stat(path).st_mtime_ns
+        write(self.root, "index.html", INDEX + "<p>new build</p>")
+        os.utime(path, ns=(mtime_ns, mtime_ns))
+        resp = self.fetch("/m/", headers={
+            "If-None-Match": first.headers["Etag"],
+            "If-Modified-Since": first.headers["Last-Modified"],
+        })
+        self.assertEqual(resp.code, 200)
+        self.assertIn("new build", resp.body.decode())
+
+    def test_replaced_file_with_older_mtime_gives_200(self):
+        first = self.fetch("/m/")
+        path = os.path.join(self.root, "index.html")
+        mtime_ns = os.stat(path).st_mtime_ns
+        write(self.root, "index.html", INDEX + "<p>older build</p>")
+        os.utime(path, ns=(mtime_ns - 3600 * 10**9, mtime_ns - 3600 * 10**9))
+        resp = self.fetch("/m/", headers={
+            "If-None-Match": first.headers["Etag"],
+            "If-Modified-Since": first.headers["Last-Modified"],
+        })
+        self.assertEqual(resp.code, 200)
+        self.assertIn("older build", resp.body.decode())
+
     def test_version_query_adds_no_long_cache(self):
         resp = self.fetch("/m/?v=1")
         self.assertEqual(resp.headers["Cache-Control"], "no-cache")

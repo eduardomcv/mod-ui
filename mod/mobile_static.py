@@ -34,6 +34,12 @@ class MobileStaticFileHandler(web.StaticFileHandler):
         st = os.stat(self.absolute_path)
         return etag(st.st_mtime_ns, st.st_size)
 
+    def should_return_304(self):
+        # tornado 4.3 also answers 304 on If-Modified-Since when the ETag differs.
+        if self.request.headers.get("If-None-Match"):
+            return self.check_etag_header()
+        return web.StaticFileHandler.should_return_304(self)
+
     def get_cache_time(self, path, modified, mime_type):
         # The default gives ?v= a cache of ten years, Expires included.
         return 0
