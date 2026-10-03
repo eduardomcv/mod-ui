@@ -115,9 +115,10 @@ Messages pi-stomp receives and handles (`../pi-stomp/modalapi/ws_protocol.py` de
 | `loading_start <isDefault>` | Pedalboard is being torn down and rebuilt | Suppresses outbound param_set; flushes stale outbound queue |
 | `loading_end <snapshotIndex>` | Pedalboard fully loaded | Clears loading flag; stashes snapshot index for file-watch path |
 | `pedal_snapshot <index> <name>` | Active snapshot changed | Updates LCD title; may activate blend mode |
+| `pedal_snapshots_changed <current_idx>` | Snapshot list changed (broadcast to all clients after a successful snapshot rename or remove; clients refetch `/snapshot/list`) | None |
 | `param_set /graph/<instance> :bypass <0|1>` | Plugin bypassed/unbypassed | Updates plugin state; redraws LCD and LED |
 | `param_set /graph/<instance> <symbol> <value>` | Parameter value changed | Caches value; mirrors onto bound controls |
-| `add <instance> <uri> …` | Plugin added to pedalboard | Buffers bypass state during load; registers plugin |
+| `add <instance> <uri> … <instance_number>` | Plugin added to pedalboard (the instance number is the 8th field) | Buffers bypass state during load; registers plugin |
 | `remove <instance>` | Plugin removed | Removes from pedalboard plugin list |
 | `connect / disconnect` | Port wiring changed | Used for state reconciliation |
 | `midi_map <instance> <symbol> <ch> <cc>` | MIDI binding learned | Updates MIDI CC map |
