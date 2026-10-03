@@ -59,6 +59,7 @@ from mod.sfzbuilder import (
     load_bank, rename_bank, delete_bank,
 )
 from mod.session import SESSION
+from mod.ws_messages import format_snapshots_changed
 from modtools.utils import (
     kPedalboardInfoUserOnly, kPedalboardInfoFactoryOnly, kPedalboardInfoBoth,
     init as lv2_init, cleanup as lv2_cleanup,
@@ -1807,6 +1808,9 @@ class SnapshotRename(JsonRequestHandler):
 
         yield gen.Task(SESSION.host.hmi_report_ss_name_if_current, idx)
 
+        if ok:
+            SESSION.host.msg_callback(format_snapshots_changed(SESSION.host.current_pedalboard_snapshot_id))
+
         self.write({
             'ok': ok,
             'title': title,
@@ -1816,6 +1820,11 @@ class SnapshotRemove(JsonRequestHandler):
     def get(self):
         idx = int(self.get_argument('id'))
         ok  = SESSION.host.snapshot_remove(idx)
+
+        # Indices above idx moved down by one; footswitches address snapshots by index.
+        if ok:
+            SESSION.host.msg_callback(format_snapshots_changed(SESSION.host.current_pedalboard_snapshot_id))
+
         self.write(ok)
 
 class SnapshotList(JsonRequestHandler):

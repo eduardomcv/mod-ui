@@ -16,3 +16,7 @@ def format_add_message(instance, uri, x, y, bypassed, sversion, build_env, insta
                                                 sversion,
                                                 int(bool(build_env)),
                                                 instance_id)
+
+
+def format_snapshots_changed(current_idx):
+    return "pedal_snapshots_changed %d" % current_idx

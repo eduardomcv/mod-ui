@@ -4,7 +4,7 @@
 
 import unittest
 
-from mod.ws_messages import format_add_message
+from mod.ws_messages import format_add_message, format_snapshots_changed
 
 # The format before the instance number was added, at all three call sites.
 LEGACY_ADD = "add %s %s %.1f %.1f %d %s %d"
@@ -36,6 +36,18 @@ class TestFormatAddMessage(unittest.TestCase):
         self.assertEqual((cmd, instance, parts[0]), ("add", "/graph/DS1", "urn:x"))
         self.assertEqual((float(parts[1]), float(parts[2]), int(parts[3])), (10.0, 20.0, 1))
         self.assertEqual(int(parts[6]), 7)
+
+
+class TestFormatSnapshotsChanged(unittest.TestCase):
+    def test_golden(self):
+        self.assertEqual(format_snapshots_changed(2), "pedal_snapshots_changed 2")
+
+    def test_no_current_snapshot(self):
+        self.assertEqual(format_snapshots_changed(-1), "pedal_snapshots_changed -1")
+
+    def test_is_not_read_as_a_snapshot_load(self):
+        # host.js:188 and pi-stomp both match the first token exactly.
+        self.assertNotEqual(format_snapshots_changed(0).split(" ", 1)[0], "pedal_snapshot")
 
 
 if __name__ == "__main__":
