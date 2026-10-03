@@ -150,6 +150,15 @@ def get_unique_name(name, names):
     return name
 
 
+def snapshot_index_after_remove(current, removed):
+    # Removing a snapshot shifts every later one down by one.
+    if current == removed:
+        return -1
+    if current > removed:
+        return current - 1
+    return current
+
+
 def normalize_for_hw(string, limit = 31):
     return '"%s"' % (
         normalize('NFKD',string).encode('ascii','ignore').decode('ascii','ignore').replace('"','')[:limit].upper()

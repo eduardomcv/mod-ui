@@ -28,7 +28,7 @@ import shutil
 from mod import (
     TextFileFlusher,
     get_hardware_descriptor, get_nearest_valid_scalepoint_value, get_unique_name,
-    read_file_contents, safe_json_load, normalize_for_hw, symbolify
+    read_file_contents, safe_json_load, normalize_for_hw, snapshot_index_after_remove, symbolify
 )
 from mod.addressings import Addressings
 from mod.bank import (
@@ -3133,8 +3133,7 @@ class Host(object):
         self.pedalboard_modified = True
         self.pedalboard_snapshots.remove(snapshot_to_remove)
 
-        if self.current_pedalboard_snapshot_id == idx:
-            self.current_pedalboard_snapshot_id = -1
+        self.current_pedalboard_snapshot_id = snapshot_index_after_remove(self.current_pedalboard_snapshot_id, idx)
 
         return True
 
