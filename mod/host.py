@@ -134,6 +134,7 @@ from mod.settings import (
 from mod.tuner import (
     find_freqnotecents,
 )
+from mod.ws_messages import format_add_message
 from modtools.utils import (
     charPtrToString,
     kPedalboardInfoUserOnly, kPedalboardInfoFactoryOnly,
@@ -2139,11 +2140,12 @@ class Host(object):
 
             rinstances[instance_id] = pluginData['instance']
 
-            websocket.write_message("add %s %s %.1f %.1f %d %s %d" % (pluginData['instance'], pluginData['uri'],
-                                                                      pluginData['x'], pluginData['y'],
-                                                                      int(pluginData['bypassed']),
-                                                                      pluginData['sversion'],
-                                                                      int(bool(pluginData['buildEnv']))))
+            websocket.write_message(format_add_message(pluginData['instance'], pluginData['uri'],
+                                                       pluginData['x'], pluginData['y'],
+                                                       pluginData['bypassed'],
+                                                       pluginData['sversion'],
+                                                       pluginData['buildEnv'],
+                                                       instance_id))
 
             if crashed:
                 self.send_notmodified("add %s %d" % (pluginData['uri'], instance_id))
@@ -2581,10 +2583,11 @@ class Host(object):
                     snapshot['plugins_added'].append(instance_id)
 
             callback(True)
-            self.msg_callback("add %s %s %.1f %.1f %d %s %d" % (instance, uri, x, y,
-                                                                int(bypassed),
-                                                                sversion,
-                                                                int(bool(extinfo['buildEnvironment']))))
+            self.msg_callback(format_add_message(instance, uri, x, y,
+                                                 bypassed,
+                                                 sversion,
+                                                 extinfo['buildEnvironment'],
+                                                 instance_id))
 
         self.send_modified("add %s %d" % (uri, instance_id), host_callback, datatype='int')
 
@@ -3958,11 +3961,12 @@ class Host(object):
             if p['bypassed']:
                 self.send_notmodified("bypass %d 1" % (instance_id,))
 
-            self.msg_callback("add %s %s %.1f %.1f %d %s %d" % (instance,
-                                                                p['uri'], p['x'], p['y'],
-                                                                int(p['bypassed']),
-                                                                pluginData['sversion'],
-                                                                int(bool(extinfo['buildEnvironment']))))
+            self.msg_callback(format_add_message(instance,
+                                                 p['uri'], p['x'], p['y'],
+                                                 p['bypassed'],
+                                                 pluginData['sversion'],
+                                                 extinfo['buildEnvironment'],
+                                                 instance_id))
 
             if p['bypassCC']['channel'] >= 0 and p['bypassCC']['control'] >= 0:
                 pluginData['addressings'][':bypass'] = self.addressings.add_midi(instance_id, ":bypass",
