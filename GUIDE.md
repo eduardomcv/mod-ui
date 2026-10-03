@@ -177,6 +177,7 @@ A more discoverable/filterable store UI, dependency handling between plugin bund
 |----------|-------------------------|---------|
 | `MOD_USER_PEDALBOARDS_DIR` | `~/.pedalboards` or `/home/pistomp/data/.pedalboards` | Where user pedalboards live |
 | `MOD_FACTORY_PEDALBOARDS_DIR` | `/usr/share/mod/pedalboards/` | Read-only factory boards |
+| `MOD_MOBILE_HTML_DIR` | `/usr/share/pistomp-chain/` | Built pistomp-chain app, served at `/m/` (404 when absent) |
 | `PATCHSTORAGE_API_URL` | `https://patchstorage.com/api/beta/patches` | PatchStorage API root |
 | `PATCHSTORAGE_PLATFORM_ID` | `8046` | Platform taxonomy ID |
 | `PATCHSTORAGE_TARGET_ID` | `8280` | Target/arch taxonomy ID (`rpi-aarch64`) |

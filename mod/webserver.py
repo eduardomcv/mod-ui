@@ -31,7 +31,7 @@ import urllib.request
 
 from mod.profile import Profile
 from mod.settings import (APP, LOG, DEV_API,
-                          HTML_DIR, DOWNLOAD_TMP_DIR, DEVICE_KEY, DEVICE_WEBSERVER_PORT,
+                          HTML_DIR, MOBILE_HTML_DIR, DOWNLOAD_TMP_DIR, DEVICE_KEY, DEVICE_WEBSERVER_PORT,
                           CLOUD_HTTP_ADDRESS, CLOUD_LABS_HTTP_ADDRESS,
                           PLUGINS_HTTP_ADDRESS, PEDALBOARDS_HTTP_ADDRESS, CONTROLCHAIN_HTTP_ADDRESS,
                           USER_BANKS_JSON_FILE,
@@ -50,6 +50,7 @@ from mod import (
     get_hardware_descriptor, get_unique_name, symbolify,
 )
 from mod.bank import list_banks, save_banks, remove_pedalboard_from_banks
+from mod.mobile_static import MobileStaticFileHandler
 from mod.sfzbuilder import (
     AUDIO_EXTENSIONS, SIDECAR_NAME,
     sanitize_filename, unique_filename, list_banks as sfz_list_banks,
@@ -2736,6 +2737,8 @@ application = web.Application(
             # This route must come before the catch-all below. The islands
             # need a different cache policy. See IslandStaticFileHandler.
             (r"/js/app/(.*)", IslandStaticFileHandler, {"path": os.path.join(HTML_DIR, "js", "app")}),
+            # The phone UI needs its own cache policy too. See mod/mobile_spa.py.
+            *MobileStaticFileHandler.urls(MOBILE_HTML_DIR),
             (r"/js/templates.js$", BulkTemplateLoader),
 
             (r"/websocket/?$", ServerWebSocket),

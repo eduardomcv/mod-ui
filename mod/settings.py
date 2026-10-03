@@ -64,6 +64,7 @@ MODEL_TYPE = os.environ.get('MOD_MODEL_TYPE', None)
 DEVICE_WEBSERVER_PORT = int(os.environ.get('MOD_DEVICE_WEBSERVER_PORT', 80))
 
 HTML_DIR = os.environ.get('MOD_HTML_DIR', join(sys.prefix, 'share/mod/html/'))
+MOBILE_HTML_DIR = os.environ.get('MOD_MOBILE_HTML_DIR', '/usr/share/pistomp-chain/')
 DEFAULT_PEDALBOARD_COPY = os.environ.pop('MOD_DEFAULT_PEDALBOARD', join(sys.prefix, 'share/mod/default.pedalboard'))
 DEFAULT_PEDALBOARD = join(LV2_PEDALBOARDS_DIR, "default.pedalboard")
 
