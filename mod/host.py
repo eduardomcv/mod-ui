@@ -115,6 +115,7 @@ from mod.mod_protocol import (
     MENU_ID_TOP,
     menu_item_id_to_str,
 )
+from mod.pedalboard_sidecars import copy_sidecars
 from mod.profile import (
     Profile,
     apply_mixer_values,
@@ -4101,6 +4102,7 @@ class Host(object):
 
             # create bundle path
             os.mkdir(bundlepath)
+            copy_sidecars(self.pedalboard_path, bundlepath)
             self.pedalboard_path = bundlepath
 
         # save ttl
