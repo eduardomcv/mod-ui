@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2012-2023 MOD Audio UG
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import json
 import os
 import shutil
 import tempfile
@@ -114,6 +115,31 @@ class TestEtag(unittest.TestCase):
     def test_changes_with_mtime_and_size(self):
         self.assertNotEqual(mobile_spa.etag(1, 10), mobile_spa.etag(2, 10))
         self.assertNotEqual(mobile_spa.etag(1, 10), mobile_spa.etag(1, 11))
+
+
+class TestClientConfig(unittest.TestCase):
+    def config(self, version="1.13.0"):
+        return mobile_spa.client_config(48000.0, "/home/pistomp/data/.pedalboards/default.pedalboard",
+                                        ["urn:a", "urn:b"], version)
+
+    def test_keys_are_the_client_contract(self):
+        self.assertEqual(sorted(self.config()), ["defaultPedalboard", "favorites", "sampleRate", "version"])
+
+    def test_values(self):
+        config = self.config()
+        self.assertEqual(config["sampleRate"], 48000.0)
+        self.assertEqual(config["defaultPedalboard"], "/home/pistomp/data/.pedalboards/default.pedalboard")
+        self.assertEqual(config["favorites"], ["urn:a", "urn:b"])
+        self.assertEqual(config["version"], "1.13.0")
+
+    def test_favorites_are_a_copy(self):
+        favorites = ["urn:a"]
+        config = mobile_spa.client_config(48000.0, "", favorites, None)
+        favorites.append("urn:b")
+        self.assertEqual(config["favorites"], ["urn:a"])
+
+    def test_unknown_version_is_json_null(self):
+        self.assertEqual(json.loads(json.dumps(self.config(version=None)))["version"], None)
 
 
 if __name__ == "__main__":

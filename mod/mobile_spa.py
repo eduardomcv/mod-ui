@@ -69,3 +69,13 @@ def etag(mtime_ns, size):
     ETag and the browser would get 304 for the old index.html.
     """
     return '"%x-%x"' % (mtime_ns, size)
+
+
+def client_config(sample_rate, default_pedalboard, favorites, version):
+    """Gives the values that index.html gets as template variables."""
+    return {
+        'sampleRate': sample_rate,
+        'defaultPedalboard': default_pedalboard,
+        'favorites': list(favorites),
+        'version': version,
+    }

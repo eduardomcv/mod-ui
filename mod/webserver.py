@@ -50,6 +50,7 @@ from mod import (
     get_hardware_descriptor, get_unique_name, symbolify,
 )
 from mod.bank import list_banks, save_banks, remove_pedalboard_from_banks
+from mod.mobile_spa import client_config
 from mod.mobile_static import MobileStaticFileHandler
 from mod.sfzbuilder import (
     AUDIO_EXTENSIONS, SIDECAR_NAME,
@@ -465,6 +466,12 @@ class SystemInfo(JsonRequestHandler):
         }
 
         self.write(info)
+
+class SystemClientConfig(JsonRequestHandler):
+    def get(self):
+        # index.html gets these as template variables. The app at /m/ has no template.
+        self.set_header("Cache-Control", "no-cache")
+        self.write(client_config(get_jack_sample_rate(), DEFAULT_PEDALBOARD, gState.favorites, IMAGE_VERSION))
 
 class SystemPreferences(JsonRequestHandler):
     OPTION_NULL            = 0
@@ -2604,6 +2611,7 @@ application = web.Application(
             (r"/system/prefs", SystemPreferences),
             (r"/system/exechange", SystemExeChange),
             (r"/system/cleanup", SystemCleanup),
+            (r"/system/client-config", SystemClientConfig),
 
             (r"/update/download/", UpdateDownload),
             (r"/update/begin", UpdateBegin),
